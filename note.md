@@ -168,8 +168,71 @@ class Choice(models.Model):
 ## はじめての Django アプリ作成、その 4
 
 ### 簡単なフォームを書く
+- HTMLテンプレートにform要素を追加する
+    
+    ```HTML
+    <form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>{{ question.question_text }}</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+    </fieldset>
+    <input type="submit" value="Vote">
+    </form>
+    ```
+    
+    - formタグの`action="{% url 'polls:vote' question.id %}"`ってなんだろうか？
+        - どういう文法か？順番に引数として渡されるはず、positional argsとしてparseされる？
+    - `forloop.counter`は`for`タグのる＾プから、何回ループが実行されたか？の回数
+    - クロスサイトリクエストフォージェリ対策で、POSTフォームには、 `{% csrf_token %}` テンプレートタグを使う
+        - HTML上は何も表示されないが、レンダリングされるとCSRF対策の隠しフォームが生成される
+        `<input type='hidden' name='csrfmiddlewaretoken' value='X3tB3GHJyLr4n1UADOXe5jU6CvBvI6EP' />`   
+        valueの値はランダムのトークンで、サーバー側での検証に使われる
+            - 具体的にどうやって？使われるのか？
+- `vote()`関数の実装
+  
+  ```Python
+  from django.db.models import F
+  from django.http import HttpResponse, HttpResponseRedirect
+  from django.shortcuts import get_object_or_404, render
+  from django.urls import reverse
+
+  from .models import Choice, Question
+
+
+  # ...
+    def vote(request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        try:
+            selected_choice = question.choice_set.get(pk=request.POST["choice"])
+        except (KeyError, Choice.DoesNotExist):
+            # Redisplay the question voting form.
+            return render(
+                request,
+                "polls/detail.html",
+                {
+                    "question": question,
+                    "error_message": "You didn't select a choice.",
+                },
+            )
+        else:
+            selected_choice.votes = F("votes") + 1
+            selected_choice.save()
+            # Always return an HttpResponseRedirect after successfully dealing
+            # with POST data. This prevents data from being posted twice if a
+            # user hits the Back button.
+            return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+  ```
+    - POSTデータに`choice`がない場合、`request.POST["choice"]`は`KeyError`を送出する
+    - 
+       
 
 ### 汎用ビューを使う: コードが少ないのはいいことだ
+
 
 ### URLconf の修正
 
