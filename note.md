@@ -176,5 +176,7 @@ class Choice(models.Model):
 
 ## 参考
 
-- https://qiita.com/muranakar/items/20a7927ffa63a5ca226a  
-コミットメッセージのprefixの付け方
+- 公式ドキュメント
+  - https://docs.djangoproject.com/ja/5.0/
+- コミットメッセージのprefixの付け方
+  - https://qiita.com/muranakar/items/20a7927ffa63a5ca226a  
