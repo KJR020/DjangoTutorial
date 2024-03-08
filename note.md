@@ -155,7 +155,14 @@ class Choice(models.Model):
 
 ### テンプレート内のハードコードされたURLを削除
 
+- 一部ハードコードしていた部分が存在した
+  - `<li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>`
+- 以下のように変更。Djangoのテンプレート構文`{% url %}`で動的にURLを指定できる。
+  - `<li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>`
+
 ### URL 名の名前空間
+
+- URLconfで設定する
 
 ## はじめての Django アプリ作成、その 4
 
