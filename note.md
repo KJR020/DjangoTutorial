@@ -162,7 +162,7 @@ class Choice(models.Model):
 
 ### URL 名の名前空間
 
-- URLconfで設定する
+- `polls/urls.py`に`app_name`変数を定義することで、URLconfに名前空間を追加できる
 
 ## はじめての Django アプリ作成、その 4
 
